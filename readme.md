@@ -1,8 +1,8 @@
 # 한글 숫자 적용 simplecaptcha
-> https://github.com/0x0000-dot-ru/simplecaptcha 인용함
+> https://github.com/0x0000-dot-ru/simplecaptcha 인용함  
 > audio captcha 한글용 및 영문으로 사용하기 위해 locale 값을 추가 시킴
 
-\`
+\
 		public AudioCaptcha build(String **locale**) {
 			// Make sure we have at least one voiceProducer
 			if (_voiceProds.size() == 0) {
@@ -37,10 +37,10 @@
 			return new AudioCaptcha(this);
 		}
 
-\`
+\
  
-> **RandomNumberVoiceKrProducer.java** 추가 한글 음원 랜덤값 생성기 추가
-> **CustomTextProducer.java** captcha로 생성된 메시지로 텍스트 추가
-> **CustomNumberVoiceProducer.java** captcha로 생성된 음성 생성 추가
+> **RandomNumberVoiceKrProducer.java** 추가 한글 음원 랜덤값 생성기 추가  
+> **CustomTextProducer.java** captcha로 생성된 메시지로 텍스트 추가  
+> **CustomNumberVoiceProducer.java** captcha로 생성된 음성 생성 추가  
 
-> 음원제공은 : https://github.com/heo-jin-young
+> 음원제공은 : [허](https://github.com/heo-jin-young)
