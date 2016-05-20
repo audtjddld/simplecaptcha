@@ -3,6 +3,7 @@
 > audio captcha 한글용 및 영문으로 사용하기 위해 locale 값을 추가 시킴
 
 \
+
 		public AudioCaptcha build(String **locale**) {
 			// Make sure we have at least one voiceProducer
 			if (_voiceProds.size() == 0) {
