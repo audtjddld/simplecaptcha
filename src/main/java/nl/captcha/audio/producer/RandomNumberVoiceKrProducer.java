@@ -9,23 +9,11 @@ import java.util.Random;
 import nl.captcha.audio.Sample;
 import nl.captcha.util.FileUtil;
 
-/**
- * <p>
- * {@link VoiceProducer} which generates a vocalization for a given number,
- * randomly selecting from a list of voices. The default voices are located in
- * the jar in the <code>sounds/en/numbers</code> directory, and have filenames
- * with a format of <i>num</i>-<i>voice</i>.wav, e.g.:
- * <code>sounds/en/numbers/1-alex.wav</code>.
- * </p>
- * 
- * @author <a href="mailto:james.childers@gmail.com">James Childers</a>
- * 
- */
-public class RandomNumberVoiceProducer implements VoiceProducer {
+public class RandomNumberVoiceKrProducer implements VoiceProducer {
 
 	private static final Random RAND = new SecureRandom();
 
-	private static final String[] DEFAULT_VOICES = { "alex", "bruce", "fred", "ralph", "kathy", "vicki", "victoria" };
+	private static final String[] DEFAULT_VOICES = { "alex", "bruce", "fred", "ralph", "kathy", "vicki", "victoria", "", "", "" };
 
 	private static final Map<Integer, String[]> DEFAULT_VOICES_MAP;
 
@@ -37,10 +25,10 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
 		for (int i = 0; i < 10; i++) {
 			files_for_num = new String[DEFAULT_VOICES.length];
 			for (int j = 0; j < files_for_num.length; j++) {
-				sb = new StringBuilder("/sounds/en/numbers/");
-				sb.append(i);
+				sb = new StringBuilder("/sounds/kr/numbers/");
+				sb.append("kor");
 				sb.append("-");
-				sb.append(DEFAULT_VOICES[j]);
+				sb.append(i);
 				sb.append(".wav");
 				files_for_num[j] = sb.toString();
 			}
@@ -50,7 +38,7 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
 
 	private final Map<Integer, String[]> _voices;
 
-	public RandomNumberVoiceProducer() {
+	public RandomNumberVoiceKrProducer() {
 		this(DEFAULT_VOICES_MAP);
 	}
 
@@ -60,13 +48,12 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
 	 * Conceptually the map must look like the following:
 	 * 
 	 * <pre>
-	 * {1 => ["/my_sounds/1-quiet.wav", "/my_sounds/1-loud.wav"],
-	 *  2 => ["/my_sounds/2-quiet.wav", "/my_sounds/2-loud.wav"]}
+	 * {1 => ["/my_sounds/1-quiet.wav", "/my_sounds/kor-0.wav"],
 	 * </pre>
 	 * 
 	 * @param voices
 	 */
-	public RandomNumberVoiceProducer(Map<Integer, String[]> voices) {
+	public RandomNumberVoiceKrProducer(Map<Integer, String[]> voices) {
 		_voices = voices;
 	}
 
@@ -85,7 +72,7 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
 		int idx = Integer.parseInt(num + "");
 		String[] files = _voices.get(idx);
 		String filename = files[RAND.nextInt(files.length)];
-
+		System.out.println(filename);
 		return FileUtil.readSample(filename);
 	}
 }

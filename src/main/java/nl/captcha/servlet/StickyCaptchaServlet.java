@@ -57,99 +57,95 @@ import nl.captcha.Captcha;
  *     &lt;servlet-mapping&gt;
  *         &lt;servlet-name&gt;StickyCaptcha&lt;/servlet-name&gt;
  *         &lt;url-pattern&gt;/stickyCaptcha.png&lt;/url-pattern&gt;
- *     &lt;/servlet-mapping&gt;</pre>
+ *     &lt;/servlet-mapping&gt;
+ * </pre>
  * 
  * @author <a href="mailto:james.childers@gmail.com">James Childers</a>
  */
 public class StickyCaptchaServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 40913456229L;
-    
-    private static int _width = 200;
-    private static int _height = 50;
-    
-    private static long _ttl = 1000 * 60 * 10;
+	private static final long serialVersionUID = 40913456229L;
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-    	if (getInitParameter("captcha-height") != null) {
-    		_height = Integer.valueOf(getInitParameter("captcha-height"));
-    	}
-    	
-    	if (getInitParameter("captcha-width") != null) {
-    		_width = Integer.valueOf(getInitParameter("captcha-width"));
-    	}
-    	
-        if (getInitParameter("ttl") != null) {
-            _ttl = Long.valueOf(getInitParameter("ttl"));
-        }
-    }
+	private static int _width = 200;
 
-    /**
-     * Write out the CAPTCHA image stored in the session. If not present,
-     * generate a new <code>Captcha</code> and write out its image.
-     * 
-     */
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        HttpSession session = req.getSession();
-        Captcha captcha;
+	private static int _height = 50;
 
-        if (session.getAttribute(NAME) == null) {
-            captcha = buildAndSetCaptcha(session);
-        }
+	private static long _ttl = 1000 * 60 * 10;
 
-        captcha = (Captcha) session.getAttribute(NAME);
-        if (shouldExpire(captcha)) {
-            captcha = buildAndSetCaptcha(session);
-        }
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		if (getInitParameter("captcha-height") != null) {
+			_height = Integer.valueOf(getInitParameter("captcha-height"));
+		}
 
-        CaptchaServletUtil.writeImage(resp, captcha.getImage());
-    }
+		if (getInitParameter("captcha-width") != null) {
+			_width = Integer.valueOf(getInitParameter("captcha-width"));
+		}
 
-    private Captcha buildAndSetCaptcha(HttpSession session) {
-        Captcha captcha = new Captcha.Builder(_width, _height)
-            .addText()
-            .gimp()
-            .addBorder()
-            .addNoise()
-            .addBackground()
-            .build();
+		if (getInitParameter("ttl") != null) {
+			_ttl = Long.valueOf(getInitParameter("ttl"));
+		}
+	}
 
-        session.setAttribute(NAME, captcha);
-        return captcha;
-    }
+	/**
+	 * Write out the CAPTCHA image stored in the session. If not present,
+	 * generate a new <code>Captcha</code> and write out its image.
+	 * 
+	 */
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		HttpSession session = req.getSession();
+		Captcha captcha;
 
-    /**
-     * Set the length of time the CAPTCHA will live in session, in milliseconds.
-     * 
-     * @param ttl
-     */
-    static void setTtl(long ttl) {
-        if (ttl < 0) {
-            ttl = 0;
-        }
+		if (session.getAttribute(NAME) == null) {
+			captcha = buildAndSetCaptcha(session);
+		}
 
-        _ttl = ttl;
-    }
+		captcha = (Captcha) session.getAttribute(NAME);
+		if (shouldExpire(captcha)) {
+			captcha = buildAndSetCaptcha(session);
+		}
 
-    /**
-     * Get the time to live for the CAPTCHA, in milliseconds.
-     * 
-     * @return
-     */
-    static long getTtl() {
-        return _ttl;
-    }
+		CaptchaServletUtil.writeImage(resp, captcha.getImage());
+	}
 
-    // Expire the CAPTCHA after a given number of minutes
-    static boolean shouldExpire(Captcha captcha) {
-        long ts = captcha.getTimeStamp().getTime();
-        long now = new Date().getTime();
-        long diff = now - ts;
+	private Captcha buildAndSetCaptcha(HttpSession session) {
+		Captcha captcha = new Captcha.Builder(_width, _height).addText().gimp().addBorder().addNoise().addBackground()
+				.build();
 
-        return diff >= _ttl;
-    }
+		session.setAttribute(NAME, captcha);
+		return captcha;
+	}
+
+	/**
+	 * Set the length of time the CAPTCHA will live in session, in milliseconds.
+	 * 
+	 * @param ttl
+	 */
+	static void setTtl(long ttl) {
+		if (ttl < 0) {
+			ttl = 0;
+		}
+
+		_ttl = ttl;
+	}
+
+	/**
+	 * Get the time to live for the CAPTCHA, in milliseconds.
+	 * 
+	 * @return
+	 */
+	static long getTtl() {
+		return _ttl;
+	}
+
+	// Expire the CAPTCHA after a given number of minutes
+	static boolean shouldExpire(Captcha captcha) {
+		long ts = captcha.getTimeStamp().getTime();
+		long now = new Date().getTime();
+		long diff = now - ts;
+
+		return diff >= _ttl;
+	}
 }

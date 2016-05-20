@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import nl.captcha.audio.noise.RandomNoiseProducer;
 import nl.captcha.audio.noise.NoiseProducer;
+import nl.captcha.audio.noise.RandomNoiseProducer;
+import nl.captcha.audio.producer.RandomNumberVoiceKrProducer;
 import nl.captcha.audio.producer.RandomNumberVoiceProducer;
 import nl.captcha.audio.producer.VoiceProducer;
 import nl.captcha.text.producer.NumbersAnswerProducer;
@@ -20,10 +21,7 @@ import nl.captcha.text.producer.TextProducer;
  * </p>
  * 
  * <pre>
- * AudioCaptcha ac = new AudioCaptcha.Builder()
- *   .addAnswer()
- *   .addNoise()
- *   .build();
+ * AudioCaptcha ac = new AudioCaptcha.Builder().addAnswer().addNoise().build();
  * </pre>
  * <p>
  * Note that the <code>build()</code> method must always be called last. Other
@@ -35,117 +33,126 @@ import nl.captcha.text.producer.TextProducer;
  */
 public final class AudioCaptcha {
 
-    public static final String NAME = "audioCaptcha";
-    private static final Random RAND = new SecureRandom();
+	public static final String NAME = "audioCaptcha";
 
-    private Builder _builder;
+	private static final Random RAND = new SecureRandom();
 
-    private AudioCaptcha(Builder builder) {
-        _builder = builder;
-    }
+	private Builder _builder;
 
-    public static class Builder {
+	private AudioCaptcha(Builder builder) {
+		_builder = builder;
+	}
 
-        private String _answer = "";
-        private Sample _challenge;
-        private List<VoiceProducer> _voiceProds;
-        private List<NoiseProducer> _noiseProds;
+	public static class Builder {
 
-        public Builder() {
-            _voiceProds = new ArrayList<VoiceProducer>();
-            _noiseProds = new ArrayList<NoiseProducer>();
-        }
+		private String _answer = "";
 
-        public Builder addAnswer() {
-            return addAnswer(new NumbersAnswerProducer());
-        }
+		private Sample _challenge;
 
-        public Builder addAnswer(TextProducer ansProd) {
-            _answer += ansProd.getText();
+		private List<VoiceProducer> _voiceProds;
 
-            return this;
-        }
+		private List<NoiseProducer> _noiseProds;
 
-        public Builder addVoice() {
-            _voiceProds.add(new RandomNumberVoiceProducer());
+		public Builder() {
+			_voiceProds = new ArrayList<VoiceProducer>();
+			_noiseProds = new ArrayList<NoiseProducer>();
+		}
 
-            return this;
-        }
+		public Builder addAnswer() {
+			return addAnswer(new NumbersAnswerProducer());
+		}
 
-        public Builder addVoice(VoiceProducer vProd) {
-            _voiceProds.add(vProd);
+		public Builder addAnswer(TextProducer ansProd) {
+			_answer += ansProd.getText();
 
-            return this;
-        }
+			return this;
+		}
 
-        public Builder addNoise() {
-            return addNoise(new RandomNoiseProducer());
-        }
+		public Builder addVoice(String locale) {
+			if (locale.equals("en")) {
+				_voiceProds.add(new RandomNumberVoiceProducer());
+			} else {
+				_voiceProds.add(new RandomNumberVoiceKrProducer());
+			}
 
-        public Builder addNoise(NoiseProducer noiseProd) {
-            _noiseProds.add(noiseProd);
+			return this;
+		}
 
-            return this;
-        }
+		public Builder addVoice(VoiceProducer vProd) {
+			_voiceProds.add(vProd);
 
-        public AudioCaptcha build() {
-            // Make sure we have at least one voiceProducer
-            if (_voiceProds.size() == 0) {
-                addVoice();
-            }
+			return this;
+		}
 
-            // Convert answer to an array
-            char[] ansAry = _answer.toCharArray();
+		public Builder addNoise() {
+			return addNoise(new RandomNoiseProducer());
+		}
 
-            // Make a List of Samples for each character
-            VoiceProducer vProd;
-            List<Sample> samples = new ArrayList<Sample>();
-            Sample sample;
-            for (int i = 0; i < ansAry.length; i++) {
-                // Create Sample for this character from one of the
-                // VoiceProducers
-                vProd = _voiceProds.get(RAND.nextInt(_voiceProds.size()));
-                sample = vProd.getVocalization(ansAry[i]);
-                samples.add(sample);
-            }
+		public Builder addNoise(NoiseProducer noiseProd) {
+			_noiseProds.add(noiseProd);
 
-            // 3. Add noise, if any, and return the result
-            if (_noiseProds.size() > 0) {
-                NoiseProducer nProd = _noiseProds.get(RAND.nextInt(_noiseProds
-                        .size()));
-                _challenge = nProd.addNoise(samples);
+			return this;
+		}
 
-                return new AudioCaptcha(this);
-            }
+		public AudioCaptcha build(String locale) {
+			// Make sure we have at least one voiceProducer
+			if (_voiceProds.size() == 0) {
+				addVoice(locale);
+			}
 
-            _challenge = Mixer.append(samples);
+			// Convert answer to an array
+			char[] ansAry = _answer.toCharArray();
 
-            return new AudioCaptcha(this);
-        }
+			// Make a List of Samples for each character
+			VoiceProducer vProd;
+			List<Sample> samples = new ArrayList<Sample>();
+			Sample sample;
+			for (int i = 0; i < ansAry.length; i++) {
+				// Create Sample for this character from one of the
+				// VoiceProducers
+				vProd = _voiceProds.get(RAND.nextInt(_voiceProds.size()));
+				sample = vProd.getVocalization(ansAry[i]);
+				samples.add(sample);
+			}
 
-        @Override public String toString() {
-            StringBuffer sb = new StringBuffer();
-            sb.append("[Answer: ");
-            sb.append(_answer);
-            sb.append("]");
+			// 3. Add noise, if any, and return the result
+			if (_noiseProds.size() > 0) {
+				NoiseProducer nProd = _noiseProds.get(RAND.nextInt(_noiseProds.size()));
+				_challenge = nProd.addNoise(samples);
 
-            return sb.toString();
-        }
-    }
+				return new AudioCaptcha(this);
+			}
 
-    public boolean isCorrect(String answer) {
-        return answer.equals(_builder._answer);
-    }
+			_challenge = Mixer.append(samples);
 
-    public String getAnswer() {
-        return _builder._answer;
-    }
+			return new AudioCaptcha(this);
+		}
 
-    public Sample getChallenge() {
-        return _builder._challenge;
-    }
+		@Override
+		public String toString() {
+			StringBuffer sb = new StringBuffer();
+			sb.append("[Answer: ");
+			sb.append(_answer);
+			sb.append("]");
 
-    @Override public String toString() {
-        return _builder.toString();
-    }
+			return sb.toString();
+		}
+	}
+
+	public boolean isCorrect(String answer) {
+		return answer.equals(_builder._answer);
+	}
+
+	public String getAnswer() {
+		return _builder._answer;
+	}
+
+	public Sample getChallenge() {
+		return _builder._challenge;
+	}
+
+	@Override
+	public String toString() {
+		return _builder.toString();
+	}
 }

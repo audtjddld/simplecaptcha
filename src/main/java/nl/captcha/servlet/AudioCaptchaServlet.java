@@ -16,22 +16,19 @@ import nl.captcha.audio.AudioCaptcha;
  */
 public class AudioCaptchaServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 4690256047223360039L;
+	private static final long serialVersionUID = 4690256047223360039L;
 
-    @Override protected void doGet(HttpServletRequest req,
-            HttpServletResponse resp) throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		AudioCaptcha ac = new AudioCaptcha.Builder().addAnswer().addNoise().build("kr");
 
-        AudioCaptcha ac = new AudioCaptcha.Builder()
-            .addAnswer()
-            .addNoise()
-            .build();
+		req.getSession().setAttribute(AudioCaptcha.NAME, ac);
+		CaptchaServletUtil.writeAudio(resp, ac.getChallenge());
+	}
 
-        req.getSession().setAttribute(AudioCaptcha.NAME, ac);
-        CaptchaServletUtil.writeAudio(resp, ac.getChallenge());
-    }
-
-    @Override protected void doPost(HttpServletRequest req,
-            HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
-    }
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doGet(req, resp);
+	}
 }
