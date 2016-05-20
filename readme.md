@@ -1,4 +1,4 @@
-# 한글 숫자 적용 simplecaptcha
+# 한글 숫자 음성 적용 simplecaptcha
 > https://github.com/0x0000-dot-ru/simplecaptcha 인용함  
 > audio captcha 한글용 및 영문으로 사용하기 위해 locale 값을 추가 시킴
 
