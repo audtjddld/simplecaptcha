@@ -13,8 +13,6 @@ public class RandomNumberVoiceKrProducer implements VoiceProducer {
 
 	private static final Random RAND = new SecureRandom();
 
-	private static final String[] DEFAULT_VOICES = { "alex", "bruce", "fred", "ralph", "kathy", "vicki", "victoria", "", "", "" };
-
 	private static final Map<Integer, String[]> DEFAULT_VOICES_MAP;
 
 	static {
@@ -23,13 +21,10 @@ public class RandomNumberVoiceKrProducer implements VoiceProducer {
 		StringBuilder sb;
 
 		for (int i = 0; i < 10; i++) {
-			files_for_num = new String[DEFAULT_VOICES.length];
+			files_for_num = new String[10];
 			for (int j = 0; j < files_for_num.length; j++) {
 				sb = new StringBuilder("/sounds/kr/numbers/");
-				sb.append("kor");
-				sb.append("-");
-				sb.append(i);
-				sb.append(".wav");
+				sb.append("kor-" + i + ".wav");
 				files_for_num[j] = sb.toString();
 			}
 			DEFAULT_VOICES_MAP.put(i, files_for_num);
