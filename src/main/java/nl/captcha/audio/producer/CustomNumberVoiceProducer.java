@@ -42,7 +42,7 @@ public class CustomNumberVoiceProducer implements VoiceProducer {
 
 		int idx = Integer.parseInt(num + "");
 		String[] files = _voices.get(idx);
-		System.out.println("idx " + idx);
+		// System.out.println("idx " + idx);
 		String filename = files[idx];
 
 		return FileUtil.readSample(filename);
